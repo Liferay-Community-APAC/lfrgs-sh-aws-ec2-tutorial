@@ -23,7 +23,7 @@ allowed_cidrs = ["203.0.113.10/32"]
 license_file = "../license/license.xml"
 
 # The sample workspace repository whose GitHub Actions deploy to this stack.
-github_repository = "LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace"
+github_repository = "Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace"
 
 # If the repository uses GitHub's immutable OIDC subject format, set the prefix it reports:
 #   gh api repos/<owner>/<name>/actions/oidc/customization/sub --jq .sub_claim_prefix

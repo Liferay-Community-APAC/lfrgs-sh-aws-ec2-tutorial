@@ -3,7 +3,7 @@
 **Product:** Liferay DXP 2026.Q3 (`2026.q3.8`) by default, or 2026.Q1 LTS (`2026.q1.13-lts`), self-hosted on Amazon EC2, deployed with Docker (or the traditional Tomcat bundle), with Liferay's MCP server on for Claude
 **Audience:** Partner and customer technical teams setting up a sandbox or proof-of-concept (PoC) environment
 **Prepared by:** Liferay Customer Success APAC
-**Status:** Draft, October 2026. Sections 2 to 9, 11, 12 and 15 tested on 22 and 23 October 2026 in Asia Pacific (Tokyo): single mode end to end with both the Docker and the Tomcat runtime, and high availability with the Docker runtime (two clustered nodes, RDS Multi-AZ, EFS, failover, cache replication, rolling CI deploy). All of that ran with **DXP 2026.Q1.13 LTS**. The default is now **2026.Q3.8** with the MCP server on (sections 11.1 and 11.2); the 2026.Q3 build and image pass in GitHub Actions ([run 39884204915](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39884204915)), but **2026.Q3 and MCP haven't been run on AWS yet**. Also not yet run on AWS: section 10 (HTTPS), section 13 (backups and monitoring) and high availability with the Tomcat runtime. The Terraform passes `terraform validate` and `terraform test` (single and high availability planned against mocked AWS providers), every shell script passes ShellCheck, `render-config.sh` passes 112 checks in seven scenarios without AWS (all run by `.github/workflows/validate.yml` on every push), and the sample workspace's build and `linux/amd64` image jobs passed in GitHub Actions on 22 October 2026 ([run 39708712711](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39708712711)). Items to confirm are marked **🔎 Verify**.
+**Status:** Draft, October 2026. Sections 2 to 9, 11, 12 and 15 tested on 22 and 23 October 2026 in Asia Pacific (Tokyo): single mode end to end with both the Docker and the Tomcat runtime, and high availability with the Docker runtime (two clustered nodes, RDS Multi-AZ, EFS, failover, cache replication, rolling CI deploy). All of that ran with **DXP 2026.Q1.13 LTS**. The default is now **2026.Q3.8** with the MCP server on (sections 11.1 and 11.2); the 2026.Q3 build and image pass in GitHub Actions ([run 39884204915](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39884204915)), but **2026.Q3 and MCP haven't been run on AWS yet**. Also not yet run on AWS: section 10 (HTTPS), section 13 (backups and monitoring) and high availability with the Tomcat runtime. The Terraform passes `terraform validate` and `terraform test` (single and high availability planned against mocked AWS providers), every shell script passes ShellCheck, `render-config.sh` passes 112 checks in seven scenarios without AWS (all run by `.github/workflows/validate.yml` on every push), and the sample workspace's build and `linux/amd64` image jobs passed in GitHub Actions on 22 October 2026 ([run 39708712711](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39708712711)). Items to confirm are marked **🔎 Verify**.
 
 > ⚠️ **Unofficial documentation, for reference only.** This guide is not official Liferay documentation and is not supported by Liferay. It reflects one team's tests and may be incomplete or out of date. For official, supported guidance, see **[learn.liferay.com](https://learn.liferay.com)**, and check Liferay's [compatibility matrix](https://help.liferay.com/hc/en-us/articles/360049238151) before relying on any combination of versions here.
 
@@ -42,7 +42,7 @@ The step-by-step guide below is the source of truth; the files implement it. Ter
 | `tests/render-config.sh` | Development | Runs `render-config.sh` in an Amazon Linux 2023 container with fake AWS replies and checks every file it writes |
 | `.github/workflows/validate.yml` | Development | Runs both tests, `terraform fmt` / `validate` and ShellCheck on every push and pull request |
 | `docs/architecture-*.mmd` / `.png` | Section 1 | Architecture diagrams (Mermaid source and rendered images) |
-| [LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace) (separate repo) | Section 12 | Liferay Workspace with a sample module and client extension, and GitHub Actions that build, push to ECR and deploy to these instances |
+| [Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace) (separate repo) | Section 12 | Liferay Workspace with a sample module and client extension, and GitHub Actions that build, push to ECR and deploy to these instances |
 
 ---
 
@@ -426,7 +426,7 @@ Edit `terraform/terraform.tfvars`. The important settings:
 | `elasticsearch_version` | `8.19.20` | The sidecar version DXP 2026.Q3.8 and 2026.Q1.13 ship with |
 | `allowed_cidrs` | `["203.0.113.10/32"]` | Who can open Liferay. Find your IP with `curl -s https://checkip.amazonaws.com` and add `/32`. If your IP changes (another network, VPN), update it and `terraform -chdir=terraform apply` |
 | `license_file` | `../license/license.xml` | Uploaded to S3 by Terraform |
-| `github_repository` | `LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace` | Repository allowed to deploy (section 12). Empty skips the CI/CD role |
+| `github_repository` | `Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace` | Repository allowed to deploy (section 12). Empty skips the CI/CD role |
 | `github_oidc_subject_prefix` | empty | Set it if the repository uses GitHub's **immutable OIDC subject** (section 12.2). Empty means `repo:<owner>/<name>` |
 | `create_github_oidc_provider` | `true` | `false` if the account already has one (section 4.4) |
 | `acm_certificate_arn`, `virtual_host` | empty | HTTPS and your own domain, section 10 |
@@ -1167,9 +1167,9 @@ scripts/run-on-stack.sh "${STACK}" liferay 'sudo /opt/liferay-ec2/scripts/verify
 
 ## 12. CI/CD with GitHub Actions
 
-> ✅ **Tested on 22 October 2026** in Asia Pacific (Tokyo), single mode with the Docker runtime ([run 39725947441](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39725947441)): build, push to ECR through OIDC, deploy through SSM, and the portlet, the global CSS and the React app all working on a page. The Tomcat runtime's deploy passed on 23 October 2026 ([run 39876014417](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39876014417), see "Tomcat runtime" below).
+> ✅ **Tested on 22 October 2026** in Asia Pacific (Tokyo), single mode with the Docker runtime ([run 39725947441](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39725947441)): build, push to ECR through OIDC, deploy through SSM, and the portlet, the global CSS and the React app all working on a page. The Tomcat runtime's deploy passed on 23 October 2026 ([run 39876014417](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39876014417), see "Tomcat runtime" below).
 
-Your code (OSGi modules, client extensions, configuration) lives in a **Liferay Workspace** and reaches the instances through GitHub Actions. A ready-made workspace for this guide is **[LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace)** (DXP `2026.q1.13-lts`, a sample OSGi portlet, a global CSS client extension and a React custom element client extension built with Vite).
+Your code (OSGi modules, client extensions, configuration) lives in a **Liferay Workspace** and reaches the instances through GitHub Actions. A ready-made workspace for this guide is **[Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace)** (DXP `2026.q1.13-lts`, a sample OSGi portlet, a global CSS client extension and a React custom element client extension built with Vite).
 
 ```text
 git push ─▶ build (Gradle, JDK 21) ─▶ image (linux/amd64) ─▶ ECR ─┐
@@ -1188,7 +1188,7 @@ Use the repository directly, or create your own copy from it:
 
 ```bash
 gh repo create <org>/<your-workspace> --private --clone \
-  --template LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace     # only if it is marked as a template; otherwise fork or copy
+  --template Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace     # only if it is marked as a template; otherwise fork or copy
 ```
 
 If you use your own copy, set `github_repository = "<org>/<your-workspace>"` in `terraform.tfvars` and run `terraform apply` so the role trusts it.
@@ -1242,7 +1242,7 @@ Every push and pull request builds; pushes to `main` also build and push the ima
 
 - **Release tag:** `git tag v1.0.0 && git push origin v1.0.0` builds image `1.0.0` and deploys it. 🔎 Not yet tested.
 
-Tested on 22 October 2026: a push to `main` built and pushed `main-1041124` with `deploy` skipped and Liferay untouched ([run 39729765649](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39729765649)); a **Run workflow** with **Deploy** then rolled it out ([run 39730255875](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39730255875), `deploy` 1.5 minutes).
+Tested on 22 October 2026: a push to `main` built and pushed `main-1041124` with `deploy` skipped and Liferay untouched ([run 39729765649](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39729765649)); a **Run workflow** with **Deploy** then rolled it out ([run 39730255875](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39730255875), `deploy` 1.5 minutes).
 
 | Job | Runs on | What it does |
 | --- | --- | --- |
@@ -1278,7 +1278,7 @@ To redeploy a build by hand: `scripts/run-on-stack.sh "${STACK}" liferay '/opt/l
 
 Tested timings (single mode): `build` 1 minute, `image` 4 minutes (about 3.1 GB, 2.0 GB compressed in ECR), `deploy` 2 minutes, of which Liferay's restart is about 1 minute.
 
-**In high availability** (tested on 22 October 2026, two nodes, [run 39799656603](https://github.com/LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39799656603)): the deploy took 5 minutes, one node at a time, each taken out of the load balancer first (section 9.5):
+**In high availability** (tested on 22 October 2026, two nodes, [run 39799656603](https://github.com/Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace/actions/runs/39799656603)): the deploy took 5 minutes, one node at a time, each taken out of the load balancer first (section 9.5):
 
 ```text
 [liferay-ec2 15:03:13] Taking this node out of the load balancer (in-flight requests finish first)

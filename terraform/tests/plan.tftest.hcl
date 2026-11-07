@@ -24,7 +24,7 @@ variables {
   name              = "liferay-poc"
   allowed_cidrs     = ["203.0.113.10/32"]
   license_file      = "./tests/fake-license.xml"
-  github_repository = "LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace"
+  github_repository = "Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace"
 }
 
 run "single_docker" {
@@ -74,7 +74,7 @@ run "single_docker" {
     error_message = "GitHub Actions role expected when github_repository is set"
   }
   assert {
-    condition     = strcontains(aws_iam_role.github_actions[0].assume_role_policy, "repo:LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace:")
+    condition     = strcontains(aws_iam_role.github_actions[0].assume_role_policy, "repo:Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace:")
     error_message = "OIDC trust must be scoped to the workspace repo"
   }
 }
@@ -98,7 +98,7 @@ run "ha_docker_https" {
     liferay_runtime            = "docker"
     liferay_node_count         = 3
     acm_certificate_arn        = "arn:aws:acm:ap-northeast-1:123456789012:certificate/mock"
-    github_oidc_subject_prefix = "repo:LGSAPAC@1/lfrgs-sh-aws-ec2-sample-workspace@2"
+    github_oidc_subject_prefix = "repo:Liferay-Community-APAC@1/lfrgs-sh-aws-ec2-sample-workspace@2"
   }
   assert {
     condition     = length(aws_instance.liferay) == 3 && length(aws_instance.search) == 1
@@ -117,7 +117,7 @@ run "ha_docker_https" {
     error_message = "HTTPS listener with TLS 1.2+ policy expected"
   }
   assert {
-    condition     = strcontains(aws_iam_role.github_actions[0].assume_role_policy, "repo:LGSAPAC@1/lfrgs-sh-aws-ec2-sample-workspace@2:")
+    condition     = strcontains(aws_iam_role.github_actions[0].assume_role_policy, "repo:Liferay-Community-APAC@1/lfrgs-sh-aws-ec2-sample-workspace@2:")
     error_message = "immutable OIDC subject prefix must be used"
   }
 }

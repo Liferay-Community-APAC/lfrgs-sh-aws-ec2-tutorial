@@ -137,7 +137,7 @@ variable "license_file" {
 }
 
 variable "github_repository" {
-  description = "GitHub repository (owner/name) whose Actions may push images and deploy, for example LGSAPAC/lfrgs-sh-aws-ec2-sample-workspace. Empty skips the CI/CD role."
+  description = "GitHub repository (owner/name) whose Actions may push images and deploy, for example Liferay-Community-APAC/lfrgs-sh-aws-ec2-sample-workspace. Empty skips the CI/CD role."
   type        = string
   default     = ""
 }
