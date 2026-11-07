@@ -1532,10 +1532,6 @@ Confirm these before relying on the guide for anything beyond a sandbox:
 - [AWS Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html)
 - [Terraform AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 
-**Related**
-
-- [LGSAPAC/lfrgs-cne-alibaba-ready](https://github.com/LGSAPAC/lfrgs-cne-alibaba-ready): the same kind of guide for Liferay CNE (Kubernetes) on Alibaba Cloud ACK
-
 ---
 
 *For questions about this guide or your environment, contact your Liferay representative or Liferay Support.*
